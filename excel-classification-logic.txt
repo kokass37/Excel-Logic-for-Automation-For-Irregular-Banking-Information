@@ -1,0 +1,77 @@
+=LET(
+txtAQ, AQ2182,
+txtDC, DC2182,
+txtAU, AU2182,
+valAL, AL2182,
+
+has, LAMBDA(t, É.NÚM(PROCURAR(t, txtAQ))),
+hasDC, LAMBDA(t, É.NÚM(PROCURAR(t, txtDC))),
+hasAU, LAMBDA(t, É.NÚM(PROCURAR(t, txtAU))),
+
+feeCond, OU(
+has("Fee"),
+has("TRANSFER CHARGES"),
+has("Comission"),
+has("DUMMY"),
+has("Internal Debit"),
+has("CASH BILLING INVOICE PAID"),
+has("FINANCIAL TRANSACTION TAX"),
+has("COMM.SERV.CHARGE"),
+),
+
+payrollInsCond, OU(
+hasAU("OSSZ"),
+hasAU("ZDRAVOTNI"),
+hasAU("CESKA PRUMYSLOVA"),
+has("REVIRNI"),
+has("Internal Debit")
+),
+
+interestCond, OU(
+has("Interest"),
+has("CR.INT.CURR.PERIOD")
+),
+
+stripeCond, OU(
+has("STRIPE"),
+hasDC("STRIPE")
+),
+
+payrollTaxCond, OU(
+hasAU("FU "),
+hasDC("VZPCR ")
+),
+
+paypalCond, hasDC("Paypal"),
+internalTransferCond, has("Internal Transfer"),
+fxCond, has("FX Current Entry"),
+customerCond, has("MM C/A Entry"),
+icoCond, hasAU("Cash Upstream Combell"),
+vatCond, hasAU("FU PRO JMK BRNO"),
+refundCond, hasAU("Refund"),
+revolutCond, hasAU("Revolut"),
+nuveiCond, hasDC("NUVEI"),
+cleverCond, hasDC("Cleverbridge"),
+payrollpaymentCond,PROCX(txtAU,'Payroll Reco'!A:A,'Payroll Reco'!A:A,"")<>"",
+
+customerVendor, SE(valAL > 0, "Customer", "Vendor"),
+
+result,
+SE(feeCond, "FEE",
+SE(payrollInsCond, "Payroll Insurance",
+SE(interestCond, "Interest",
+SE(stripeCond, "STRIPE",
+SE(payrollTaxCond, "Payroll Tax",
+SE(paypalCond, "Paypal",
+SE(internalTransferCond, "Internal Transfer",
+SE(fxCond, "FX Variation",
+SE(customerCond, "Customer",
+SE(icoCond, "ICO",
+SE(vatCond, "VAT",
+SE(refundCond, "Refund",
+SE(revolutCond, "Revolut",
+SE(nuveiCond, "NUVEI",
+SE(cleverCond, "CleverBridge",
+SE(payrollpaymentCond, "Payroll Payment",
+customerVendor
+))))))))))))))) ),
